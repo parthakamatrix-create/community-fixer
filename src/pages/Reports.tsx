@@ -3,8 +3,8 @@ import { Header } from '@/components/Header';
 import { ReportCard } from '@/components/ReportCard';
 import { Button } from '@/components/ui/button';
 import { Report, ReportStatus } from '@/lib/types';
-import { getReports, updateReportStatus } from '@/lib/reportStore';
-import { Filter, MapPin, List, Search } from 'lucide-react';
+import { getReports } from '@/lib/reportStore';
+import { MapPin, List, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Link } from 'react-router-dom';
 
@@ -25,11 +25,6 @@ export default function Reports() {
   useEffect(() => {
     setReports(getReports());
   }, []);
-
-  const handleStatusChange = (id: string, status: ReportStatus) => {
-    updateReportStatus(id, status);
-    setReports(getReports());
-  };
 
   const filteredReports = reports.filter(report => {
     const matchesFilter = filter === 'all' || report.status === filter;
@@ -122,7 +117,6 @@ export default function Reports() {
               <ReportCard 
                 key={report.id} 
                 report={report}
-                onStatusChange={handleStatusChange}
               />
             ))}
           </div>

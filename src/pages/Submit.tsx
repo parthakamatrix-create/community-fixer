@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -16,6 +16,19 @@ import { cn } from '@/lib/utils';
 export default function Submit() {
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  // Check if user is logged in
+  useEffect(() => {
+    const storedUser = localStorage.getItem('localfix_user');
+    if (!storedUser) {
+      toast({
+        title: 'Login Required',
+        description: 'Please sign up or log in to report a problem.',
+        variant: 'destructive',
+      });
+      navigate('/auth');
+    }
+  }, [navigate, toast]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [formData, setFormData] = useState({

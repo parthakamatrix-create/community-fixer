@@ -1,24 +1,58 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapPin, Navigation } from 'lucide-react';
+import { MapPin, Navigation, AlertCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import { useToast } from '@/hooks/use-toast';
 
 interface LocationPickerProps {
   value: { address: string; lat: number; lng: number };
   onChange: (location: { address: string; lat: number; lng: number }) => void;
 }
 
+// Pune and PCMC bounding box (approximate)
+const PUNE_PCMC_BOUNDS = {
+  minLat: 18.35,
+  maxLat: 18.75,
+  minLng: 73.65,
+  maxLng: 74.05,
+};
+
+const isWithinPunePCMC = (lat: number, lng: number): boolean => {
+  return (
+    lat >= PUNE_PCMC_BOUNDS.minLat &&
+    lat <= PUNE_PCMC_BOUNDS.maxLat &&
+    lng >= PUNE_PCMC_BOUNDS.minLng &&
+    lng <= PUNE_PCMC_BOUNDS.maxLng
+  );
+};
+
 export function LocationPicker({ value, onChange }: LocationPickerProps) {
   const [isLocating, setIsLocating] = useState(false);
+  const [locationError, setLocationError] = useState('');
   const mapRef = useRef<HTMLDivElement>(null);
   const [mapLoaded, setMapLoaded] = useState(false);
+  const { toast } = useToast();
 
   const getCurrentLocation = () => {
     setIsLocating(true);
+    setLocationError('');
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const { latitude, longitude } = position.coords;
+          
+          // Check if location is within Pune/PCMC
+          if (!isWithinPunePCMC(latitude, longitude)) {
+            setLocationError('Location must be within Pune or PCMC area only.');
+            toast({
+              title: 'Location Not Allowed',
+              description: 'This platform only accepts reports from Pune and PCMC areas.',
+              variant: 'destructive',
+            });
+            setIsLocating(false);
+            return;
+          }
+          
           try {
             const response = await fetch(
               `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
@@ -40,10 +74,12 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
         },
         (error) => {
           console.error('Error getting location:', error);
+          setLocationError('Could not get your location. Please enter it manually.');
           setIsLocating(false);
         }
       );
     } else {
+      setLocationError('Geolocation is not supported by your browser.');
       setIsLocating(false);
     }
   };
@@ -57,11 +93,16 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
 
   return (
     <div className="space-y-3">
+      <div className="bg-muted/50 rounded-lg p-3 text-sm text-muted-foreground flex items-start gap-2">
+        <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <span>Reports are limited to <strong>Pune</strong> and <strong>PCMC</strong> areas only.</span>
+      </div>
+      
       <div className="flex gap-2">
         <div className="relative flex-1">
           <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Enter location address"
+            placeholder="Enter location in Pune/PCMC"
             value={value.address}
             onChange={(e) => onChange({ ...value, address: e.target.value })}
             className="pl-10"
@@ -79,6 +120,13 @@ export function LocationPicker({ value, onChange }: LocationPickerProps) {
           </span>
         </Button>
       </div>
+      
+      {locationError && (
+        <p className="text-sm text-destructive flex items-center gap-1">
+          <AlertCircle className="w-4 h-4" />
+          {locationError}
+        </p>
+      )}
       
       {value.lat !== 0 && value.lng !== 0 && (
         <div 
