@@ -58,9 +58,9 @@ export default function Index() {
             </p>
             
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4 animate-fade-in" style={{ animationDelay: '0.3s' }}>
-              <Link to="/submit">
+              <Link to="/auth">
                 <Button variant="hero" size="xl">
-                  Report a Problem
+                  Login / Sign Up
                   <ArrowRight className="w-5 h-5" />
                 </Button>
               </Link>
