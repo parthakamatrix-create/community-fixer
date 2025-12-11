@@ -39,3 +39,7 @@ export function updateReportStatus(id: string, status: ReportStatus): void {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(reports));
   }
 }
+
+export function clearAllReports(): void {
+  localStorage.removeItem(STORAGE_KEY);
+}
