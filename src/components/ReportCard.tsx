@@ -1,16 +1,14 @@
-import { Report, ReportStatus } from '@/lib/types';
+import { Report } from '@/lib/types';
 import { StatusBadge } from './StatusBadge';
 import { CategoryBadge } from './CategoryBadge';
 import { MapPin, Calendar, User } from 'lucide-react';
-import { Button } from './ui/button';
 import { format } from 'date-fns';
 
 interface ReportCardProps {
   report: Report;
-  onStatusChange?: (id: string, status: ReportStatus) => void;
 }
 
-export function ReportCard({ report, onStatusChange }: ReportCardProps) {
+export function ReportCard({ report }: ReportCardProps) {
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-shadow animate-fade-in">
       <div className="aspect-video relative overflow-hidden">
@@ -47,30 +45,6 @@ export function ReportCard({ report, onStatusChange }: ReportCardProps) {
             <span>{report.userName}</span>
           </div>
         </div>
-        
-        {onStatusChange && (
-          <div className="flex gap-2 pt-2">
-            {report.status !== 'in-progress' && (
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="flex-1"
-                onClick={() => onStatusChange(report.id, 'in-progress')}
-              >
-                Mark In Progress
-              </Button>
-            )}
-            {report.status !== 'resolved' && (
-              <Button 
-                size="sm" 
-                className="flex-1"
-                onClick={() => onStatusChange(report.id, 'resolved')}
-              >
-                Mark Resolved
-              </Button>
-            )}
-          </div>
-        )}
       </div>
     </div>
   );
