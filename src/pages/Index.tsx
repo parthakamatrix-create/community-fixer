@@ -27,9 +27,9 @@ const features = [
 ];
 
 const stats = [
-  { value: '500+', label: 'Issues Reported' },
-  { value: '89%', label: 'Resolved Rate' },
-  { value: '12', label: 'Neighborhoods' },
+  { value: '0', label: 'Issues Reported' },
+  { value: '0', label: 'Resolved Rate' },
+  { value: '0', label: 'Neighborhoods' },
 ];
 
 export default function Index() {
